@@ -1,0 +1,66 @@
+{
+  "name": "Nutrition Agent",
+  "description": "An AI-powered Nutrition Agent built with IBM Watsonx Granite model and Flask. Provides personalized meal plans, BMI calculation, food analysis, family nutrition plans, and healthy recipes.",
+  "keywords": [
+    "nutrition",
+    "ai",
+    "ibm-watsonx",
+    "granite",
+    "flask",
+    "meal-plan",
+    "health"
+  ],
+  "website": "https://github.com",
+  "repository": "https://github.com",
+  "logo": "https://www.ibm.com/favicon.ico",
+  "stack": "python",
+  "env": {
+    "IBM_API_KEY": {
+      "description": "IBM Cloud API Key for authenticating with IBM Watsonx.ai",
+      "required": true
+    },
+    "WATSONX_PROJECT_ID": {
+      "description": "IBM Watsonx.ai Project ID",
+      "required": true
+    },
+    "WATSONX_URL": {
+      "description": "IBM Watsonx.ai endpoint URL",
+      "value": "https://us-south.ml.cloud.ibm.com",
+      "required": false
+    },
+    "GRANITE_MODEL_ID": {
+      "description": "IBM Granite model ID to use for inference",
+      "value": "ibm/granite-13b-instruct-v2",
+      "required": false
+    },
+    "FLASK_SECRET_KEY": {
+      "description": "Flask secret key for session signing",
+      "generator": "secret",
+      "required": true
+    },
+    "FLASK_DEBUG": {
+      "description": "Enable Flask debug mode (set False in production)",
+      "value": "False",
+      "required": false
+    },
+    "PORT": {
+      "description": "Port the Flask app listens on",
+      "value": "5000",
+      "required": false
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "basic"
+    }
+  },
+  "buildpacks": [
+    {
+      "url": "heroku/python"
+    }
+  ],
+  "scripts": {
+    "postdeploy": "echo Nutrition Agent deployed successfully"
+  }
+}
