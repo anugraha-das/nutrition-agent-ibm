@@ -2,7 +2,7 @@
 
 > **IBM Watsonx.ai + Granite Models · Flask · Bootstrap 5 · Dark Mode · Mobile-First**
 
-A fully-featured AI Nutrition web application that provides personalized meal plans, calorie analysis, BMI calculations, healthy recipe suggestions, and family diet recommendations — powered by IBM Watsonx.ai's Granite LLM.
+A fully-featured AI Nutrition web application that provides personalized meal plans, calorie analysis, BMI calculations, healthy recipe suggestions, and family diet recommendations — powered by IBM Watsonx.ai & Granite Models.
 
 ---
 
@@ -21,19 +21,43 @@ A fully-featured AI Nutrition web application that provides personalized meal pl
 
 ---
 
+## 📸 Project Output & UI Showcase
+
+### Main Dashboard & Chat Interface
+The application provides a clean, intuitive interface powered by Bootstrap 5 with both light and dark mode support.
+
+**Features visible in the UI:**
+- 🟢 **Live AI Chat** with NutriGenius — conversational nutrition coaching
+- 📊 **User Profile Panel** — displays personalized health metrics (age, weight, height, BMI, activity level, diet preferences)
+- ✅ **Quick Action Buttons** — 7-day plan, protein foods, calorie check, diabetic diet, superfoods, keto plan
+- 📋 **Nutrition Tips Banner** — scrolling health tips and recommendations
+- 🎨 **Dark Mode Support** — persistent theme toggle for better UX
+- 📱 **Mobile-First Responsive Design** — works seamlessly on all devices
+
+**User Profile Captured:**
+- Name: Anugraha
+- Age: 25, Gender: Female
+- Weight: 50 kg, Height: 154 cm
+- Goal: Healthy Lifestyle
+- Activity Level: Moderate (3–5 days/week)
+- Diet Preference: Balanced Vegetarian
+- Health Conditions: None
+
+---
+
 ## 🏗️ Architecture & System Design
 
 ### 1. High-Level System Architecture
 
 ```
-┌────────────────────────────────────────────────────────────────┐
+┌────────────────────────────────────────────────────────────────────┐
 │                        Frontend (Browser)                        │
 │  Bootstrap 5 UI + Dark Mode + Mobile-First                      │
 │  (Chat, Meal Planner, BMI Calculator, Dashboard)                │
 └────────────────────────┬───────────────────────────────────────┘
                          │ HTTP/JSON
                          ▼
-┌────────────────────────────────────────────────────────────────┐
+┌────────────────────────────────────────────────────────────────────┐
 │                    Flask Web Application                         │
 │                         (app.py)                                │
 │  ┌─────────────────────────────────────────────────────────┐   │
@@ -62,7 +86,7 @@ A fully-featured AI Nutrition web application that provides personalized meal pl
 ### 2. Request-Response Flow (Chat & AI Processing)
 
 ```
-┌────────────────────────────────────────────────────────────────┐
+┌────────────────────────────────────────────────────────────────────┐
 │                      User Request                               │
 │  (Message, History, User Profile/Context)                      │
 └────────────────────────┬───────────────────────────────────────┘
@@ -159,9 +183,9 @@ A fully-featured AI Nutrition web application that provides personalized meal pl
 ### 4. LangFlow Workflow Diagram
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
+┌────────────────────────────────────────────────────────────────────┐
 │                    LangFlow Workflow Pipeline                    │
-├─────────────────────────────────────────────────────────────────┤
+├────────────────────────────────────────────────────────────────────┤
 │                                                                   │
 │  ┌──────────────┐                                                │
 │  │ 1. User      │                                                │
@@ -233,7 +257,7 @@ A fully-featured AI Nutrition web application that provides personalized meal pl
 │  │    - Log interaction                 │                        │
 │  └──────────────────────────────────────┘                        │
 │                                                                   │
-└─────────────────────────────────────────────────────────────────┘
+└────────────────────────────────────────────────────────────────────┘
 ```
 
 ### 5. API Endpoint Coverage
