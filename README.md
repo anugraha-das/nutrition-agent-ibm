@@ -2,7 +2,7 @@
 
 > **IBM Watsonx.ai + Granite Models · Flask · Bootstrap 5 · Dark Mode · Mobile-First**
 
-A fully-featured AI Nutrition web application that provides personalized meal plans, calorie analysis, BMI calculations, healthy recipe suggestions, and family diet recommendations — powered by IBM Watsonx.ai & Granite LLM.
+A fully-featured AI Nutrition web application that provides personalized meal plans, calorie analysis, BMI calculations, healthy recipe suggestions, and family diet recommendations — powered by IBM Watsonx.ai's Granite LLM.
 
 ---
 
@@ -26,14 +26,14 @@ A fully-featured AI Nutrition web application that provides personalized meal pl
 ### 1. High-Level System Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
+┌────────────────────────────────────────────────────────────────┐
 │                        Frontend (Browser)                        │
 │  Bootstrap 5 UI + Dark Mode + Mobile-First                      │
 │  (Chat, Meal Planner, BMI Calculator, Dashboard)                │
-└────────────────────────┬────────────────────────────────────────┘
+└────────────────────────┬───────────────────────────────────────┘
                          │ HTTP/JSON
                          ▼
-┌─────────────────────────────────────────────────────────────────┐
+┌────────────────────────────────────────────────────────────────┐
 │                    Flask Web Application                         │
 │                         (app.py)                                │
 │  ┌─────────────────────────────────────────────────────────┐   │
@@ -45,7 +45,7 @@ A fully-featured AI Nutrition web application that provides personalized meal pl
 │  │  /api/healthy-recipes   Recipe suggestions               │   │
 │  │  /api/health-check      Connectivity status              │   │
 │  └─────────────────────────────────────────────────────────┘   │
-└────────────────────────┬────────────────────────────────────────┘
+└────────────────────────┬───────────────────────────────────────┘
                          │
         ┌────────────────┴────────────────┐
         │                                 │
@@ -62,10 +62,10 @@ A fully-featured AI Nutrition web application that provides personalized meal pl
 ### 2. Request-Response Flow (Chat & AI Processing)
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
+┌────────────────────────────────────────────────────────────────┐
 │                      User Request                               │
 │  (Message, History, User Profile/Context)                      │
-└────────────────────────┬────────────────────────────────────────┘
+└────────────────────────┬───────────────────────────────────────┘
                          │
                          ▼
         ┌────────────────────────────────┐
@@ -156,7 +156,87 @@ A fully-featured AI Nutrition web application that provides personalized meal pl
     └─────────────────────────┘
 ```
 
-### 4. API Endpoint Coverage
+### 4. LangFlow Workflow Diagram
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    LangFlow Workflow Pipeline                    │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                   │
+│  ┌──────────────┐                                                │
+│  │ 1. User      │                                                │
+│  │    Input     │                                                │
+│  └──────┬───────┘                                                │
+│         │                                                         │
+│         ▼                                                         │
+│  ┌──────────────────────────────────────┐                        │
+│  │ 2. Input Validation & Formatting     │                        │
+│  │    - Parse JSON request              │                        │
+│  │    - Validate user data              │                        │
+│  │    - Sanitize input                  │                        │
+│  └──────┬───────────────────────────────┘                        │
+│         │                                                         │
+│         ▼                                                         │
+│  ┌──────────────────────────────────────┐                        │
+│  │ 3. Context & Memory Management       │                        │
+│  │    - Load user profile               │                        │
+│  │    - Retrieve chat history           │                        │
+│  │    - Build conversation context      │                        │
+│  └──────┬───────────────────────────────┘                        │
+│         │                                                         │
+│         ▼                                                         │
+│  ┌──────────────────────────────────────┐                        │
+│  │ 4. Prompt Construction & Injection   │                        │
+│  │    ┌─ PERSONA Configuration           │                        │
+│  │    ├─ SPECIALIZATION Rules            │                        │
+│  │    ├─ SAFETY_RULES & Disclaimers      │                        │
+│  │    ├─ INDIAN_FOODS Knowledge Base     │                        │
+│  │    ├─ CALORIES_DB Reference           │                        │
+│  │    └─ RESPONSE_STYLE Formatting       │                        │
+│  └──────┬───────────────────────────────┘                        │
+│         │                                                         │
+│    ┌────┴────────┐                                               │
+│    │             │                                               │
+│    ▼             ▼                                               │
+│  ┌──────────┐  ┌────────────────────────┐                        │
+│  │ Decision │  │ IBM Watsonx.ai Check   │                        │
+│  │ Branch   │  │ - Credentials valid?   │                        │
+│  │ 5a.      │  │ - API accessible?      │                        │
+│  └──────────┘  └────────────────────────┘                        │
+│    │             │                                               │
+│    │         YES │                      NO                       │
+│    │             │                       │                       │
+│    │             ▼                       ▼                       │
+│    │     ┌──────────────────────┐  ┌───────────────┐             │
+│    │     │ 6. LLM Inference     │  │ 5b. Demo Mode │             │
+│    │     │ - Send prompt        │  │ - Return      │             │
+│    │     │ - Stream/await       │  │   hardcoded   │             │
+│    │     │   response           │  │   response    │             │
+│    │     └──────┬───────────────┘  └───────┬───────┘             │
+│    │            │                         │                     │
+│    └────────────┼─────────────────────────┘                     │
+│                 │                                                │
+│                 ▼                                                │
+│  ┌──────────────────────────────────────┐                        │
+│  │ 7. Response Processing & Formatting  │                        │
+│  │    - Parse LLM output                │                        │
+│  │    - Add disclaimers (if needed)     │                        │
+│  │    - Format JSON response            │                        │
+│  │    - Add metadata (timestamp, model) │                        │
+│  └──────┬───────────────────────────────┘                        │
+│         │                                                         │
+│         ▼                                                         │
+│  ┌──────────────────────────────────────┐                        │
+│  │ 8. Output & Client Response          │                        │
+│  │    - Send JSON to frontend           │                        │
+│  │    - Update UI (streaming/complete)  │                        │
+│  │    - Log interaction                 │                        │
+│  └──────────────────────────────────────┘                        │
+│                                                                   │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 5. API Endpoint Coverage
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -189,7 +269,7 @@ A fully-featured AI Nutrition web application that provides personalized meal pl
 └──────────────────┴──────────────────────────────────────────┘
 ```
 
-### 5. Core Components & Knowledge Base Injection
+### 6. Core Components & Knowledge Base Injection
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -224,7 +304,7 @@ A fully-featured AI Nutrition web application that provides personalized meal pl
   └──────────────────────┘
 ```
 
-### 6. Deployment Architecture
+### 7. Deployment Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -272,8 +352,8 @@ nutrition_agent/
 ### 1. Clone / Download the project
 
 ```bash
-git clone <your-repo-url>
-cd nutrition_agent
+git clone https://github.com/anugraha-das/nutrition-agent-ibm.git
+cd nutrition-agent-ibm
 ```
 
 ### 2. Create & activate a virtual environment
