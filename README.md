@@ -2,7 +2,7 @@
 
 > **IBM Watsonx.ai + Granite Models · Flask · Bootstrap 5 · Dark Mode · Mobile-First**
 
-A fully-featured AI Nutrition web application that provides personalized meal plans, calorie analysis, BMI calculations, healthy recipe suggestions, and family diet recommendations — powered by IBM Watsonx.ai Granite models.
+A fully-featured AI Nutrition web application that provides personalized meal plans, calorie analysis, BMI calculations, healthy recipe suggestions, and family diet recommendations — powered by IBM Watsonx.ai & Granite LLM.
 
 ---
 
@@ -18,6 +18,237 @@ A fully-featured AI Nutrition web application that provides personalized meal pl
 | 📊 **Dashboard** | Nutrition stats, macro breakdown, meal log |
 | 🌙 **Dark Mode** | Persistent dark/light theme toggle |
 | 📱 **Mobile-First** | Fully responsive Bootstrap 5 UI |
+
+---
+
+## 🏗️ Architecture & System Design
+
+### 1. High-Level System Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        Frontend (Browser)                        │
+│  Bootstrap 5 UI + Dark Mode + Mobile-First                      │
+│  (Chat, Meal Planner, BMI Calculator, Dashboard)                │
+└────────────────────────┬────────────────────────────────────────┘
+                         │ HTTP/JSON
+                         ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    Flask Web Application                         │
+│                         (app.py)                                │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │  /api/chat              Generate AI response             │   │
+│  │  /api/meal-plan         Create personalized meal plan    │   │
+│  │  /api/bmi               BMI, BMR, TDEE calculation       │   │
+│  │  /api/analyze-food      Nutritional analysis             │   │
+│  │  /api/family-plan       Family nutrition planning        │   │
+│  │  /api/healthy-recipes   Recipe suggestions               │   │
+│  │  /api/health-check      Connectivity status              │   │
+│  └─────────────────────────────────────────────────────────┘   │
+└────────────────────────┬────────────────────────────────────────┘
+                         │
+        ┌────────────────┴────────────────┐
+        │                                 │
+        ▼                                 ▼
+   ┌──────────────────┐         ┌──────────────────────┐
+   │  DEMO Mode       │         │ IBM Watsonx.ai       │
+   │  (Fallback)      │         │ + Granite Models     │
+   │  - Hardcoded     │         │                      │
+   │    responses     │         │ - Real AI inference  │
+   │  - Demo data     │         │ - Context-aware      │
+   └──────────────────┘         └──────────────────────┘
+```
+
+### 2. Request-Response Flow (Chat & AI Processing)
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                      User Request                               │
+│  (Message, History, User Profile/Context)                      │
+└────────────────────────┬────────────────────────────────────────┘
+                         │
+                         ▼
+        ┌────────────────────────────────┐
+        │   generate_ai_response()       │
+        │  - Accept: message, history    │
+        │  - Context: user profile       │
+        └────────────┬───────────────────┘
+                     │
+                     ▼
+        ┌────────────────────────────────────────┐
+        │  build_system_prompt()                 │
+        │  ┌────────────────────────────────┐   │
+        │  │ Inject AGENT_INSTRUCTIONS:     │   │
+        │  │  • PERSONA (name, role, tone)  │   │
+        │  │  • SPECIALIZATION (diet focus) │   │
+        │  │  • SAFETY_RULES (disclaimers)  │   │
+        │  │  • INDIAN_FOODS (knowledge)    │   │
+        │  │  • CALORIES_DB (quick ref)     │   │
+        │  │  • RESPONSE_STYLE (format)     │   │
+        │  └────────────────────────────────┘   │
+        └────────────┬──────────────────────────┘
+                     │
+        ┌────────────▼──────────────┐
+        │ Watsonx.ai Model          │
+        │ Available?                │
+        └────────────┬──────────────┘
+                     │
+        ┌────────────┴────────────────┐
+        │                             │
+       YES                            NO
+        │                             │
+        ▼                             ▼
+    ┌──────────────┐         ┌───────────────┐
+    │  Call Model  │         │ _demo_response│
+    │  inference   │         │ (Fallback)    │
+    │  API         │         └───────────────┘
+    └──────────────┘
+        │
+        ▼
+    ┌──────────────────────────────┐
+    │  Add Disclaimer (if needed)  │
+    │  & Format Response           │
+    └──────────────┬───────────────┘
+                   │
+                   ▼
+        ┌────────────────────────┐
+        │ JSON Response to Client│
+        │ - response text        │
+        │ - timestamp            │
+        │ - model ID             │
+        └────────────────────────┘
+```
+
+### 3. Data Processing Pipeline for Meal Plans
+
+```
+┌──────────────────────────────┐
+│  User Profile Input          │
+│  • Age, Gender, Weight       │
+│  • Height, Activity Level    │
+│  • Goal, Diet Type           │
+│  • Health Conditions         │
+└──────────┬───────────────────┘
+           │
+           ▼
+┌──────────────────────────────────┐
+│  generate_meal_plan()            │
+│  - Construct detailed prompt     │
+│  - Include user profile data     │
+└──────────┬──────────────────────┘
+           │
+           ▼
+┌────────────────────────────────────────┐
+│  AI Generates:                         │
+│  • Breakfast (with calories/macros)    │
+│  • Lunch (with calories/macros)        │
+│  • Snacks (with calories/macros)       │
+│  • Dinner (with calories/macros)       │
+│  • Daily totals (protein/carbs/fat)    │
+└──────────┬────────────────────────────┘
+           │
+           ▼
+    ┌─────────────────────────┐
+    │  JSON Meal Plan         │
+    │  - Days: 7/14           │
+    │ - Full meal breakdown   │
+    │ - Nutritional values    │
+    └─────────────────────────┘
+```
+
+### 4. API Endpoint Coverage
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Flask Routes                             │
+├──────────────────┬──────────────────────────────────────────┤
+│ GET  /           │ Serve index.html (main UI)               │
+├──────────────────┼──────────────────────────────────────────┤
+│ POST /api/chat   │ AI conversational coaching               │
+│                  │ → generate_ai_response()                 │
+├──────────────────┼──────────────────────────────────────────┤
+│ POST /api/meal-  │ 1–14 day personalized meal plans         │
+│      plan        │ → generate_meal_plan()                   │
+├──────────────────┼──────────────────────────────────────────┤
+│ POST /api/bmi    │ BMI, BMR, TDEE calculations              │
+│                  │ → calculate_bmi()                        │
+├──────────────────┼──────────────────────────────────────────┤
+│ POST /api/       │ Analyze nutritional content of foods     │
+│      analyze-    │ → analyze_food()                         │
+│      food        │                                          │
+├──────────────────┼──────────────────────────────────────────┤
+│ POST /api/       │ Multi-member family diet plans           │
+│      family-plan │ → family_plan()                          │
+├──────────────────┼──────────────────────────────────────────┤
+│ POST /api/       │ 3+ healthy recipe suggestions            │
+│      healthy-    │ → healthy_recipes()                      │
+│      recipes     │                                          │
+├──────────────────┼──────────────────────────────────────────┤
+│ GET  /api/       │ Connection status & model availability   │
+│      health-check│ → health_check()                         │
+└──────────────────┴──────────────────────────────────────────┘
+```
+
+### 5. Core Components & Knowledge Base Injection
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│          AGENT_INSTRUCTIONS Dictionary                       │
+│              (Global Configuration)                          │
+├─────────────────────────────────────────────────────────────┤
+│ PERSONA                     SPECIALIZATION                  │
+│ ├─ name: "NutriGenius"      ├─ primary_focus               │
+│ ├─ role: AI Coach           ├─ supported_diets (8 types)   │
+│ ├─ tone: friendly           ├─ preferred_cuisines          │
+│ └─ language: English        └─ always_consider             │
+│                                                             │
+│ SAFETY_RULES                RESPONSE_STYLE                 │
+│ ├─ always_add_disclaimer    ├─ use_bullet_points           │
+│ ├─ never_do (4 rules)       ├─ include_emojis              │
+│ └─ always_refer_doctor_for  ├─ format_meal_plans_as_tables │
+│                             └─ max_response_length         │
+│                                                             │
+│ INDIAN_FOODS (Knowledge Base)      CALORIES_DB              │
+│ ├─ staples (8 items)               ├─ 15+ common foods      │
+│ ├─ protein_sources (8 items)       ├─ Idli, Roti, Dal, etc. │
+│ ├─ healthy_snacks (6 items)        └─ Quick calorie lookup  │
+│ ├─ superfoods (5 items)                                      │
+│ └─ regional_preferences (5 regions)                         │
+└─────────────────────────────────────────────────────────────┘
+           │
+           │ Injected into every system prompt
+           ▼
+  ┌──────────────────────┐
+  │ Full System Prompt   │
+  │ (~1KB contextual)    │
+  └──────────────────────┘
+```
+
+### 6. Deployment Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     Deployment Options                       │
+├──────────────────┬──────────────────────────────────────────┤
+│ Local Dev        │  python app.py (Flask debug mode)        │
+├──────────────────┼──────────────────────────────────────────┤
+│ Production       │  gunicorn --bind 0.0.0.0:5000 app:app    │
+│ (WSGI)           │  (2 workers for concurrency)             │
+├──────────────────┼──────────────────────────────────────────┤
+│ Docker           │  Dockerfile → Docker image → Container   │
+│                  │  Exposed: port 5000                      │
+├──────────────────┼──────────────────────────────────────────┤
+│ IBM Code Engine  │  ibmcloud ce application create          │
+│                  │  + environment secrets                   │
+├──────────────────┼──────────────────────────────────────────┤
+│ Render/Railway/  │  Git-connected CD pipeline               │
+│ Fly.io           │  Automatic deployment on push            │
+└──────────────────┴──────────────────────────────────────────┘
+        │
+        ├─ .env file (credentials)
+        ├─ IBM_API_KEY, WATSONX_PROJECT_ID
+        └─ FLASK_SECRET_KEY, PORT
+```
 
 ---
 
